@@ -1,0 +1,39 @@
+# Environment
+.env
+*.env
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Data artifacts — all gitignored during development
+# Remove specific lines at final ingestion milestone to commit production artifacts
+data/repos/
+data/raw_files.jsonl
+data/skipped_files.jsonl
+data/chunks.jsonl
+data/embeddings.npy
+data/embeddings_partial.npy
+data/embed_manifest.json
+data/faiss.index
+data/bm25.pkl
+data/metadata.pkl
+data/validation_report.json
+data/sample_inspection.txt
+data/ingest.log
+
+# Assignment brief
+GenAI_Chatbot.pdf
+
+# Design/planning docs (local reference only)
+DESIGN_PLAN.md
+INGESTION_DESIGN.md
+INGESTION_EXEC_SPEC.md
+IMPLEMENTATION_PLAN.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
