@@ -14,9 +14,9 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, Set, Tuple
+from typing import Any, Dict, Generator, Optional, Set, Tuple
 
-import yaml
+import yaml  # type: ignore[import-not-found]
 
 # -- Corpus filter config --------------------------------------------------
 
@@ -66,7 +66,7 @@ class MarkdownDocument:
 
 # -- Frontmatter parsing ---------------------------------------------------
 
-def parse_frontmatter(raw_text: str) -> Tuple[Dict, str]:
+def parse_frontmatter(raw_text: str) -> Tuple[Dict[str, Any], str]:
     """Split a markdown file into frontmatter dict and body text.
 
     Handles:
@@ -86,21 +86,21 @@ def parse_frontmatter(raw_text: str) -> Tuple[Dict, str]:
     try:
         meta = yaml.safe_load(yaml_block)
     except yaml.YAMLError:
-        print(f"[WALK] WARN  malformed frontmatter, treating as no-frontmatter")
+        print("[WALK] WARN  malformed frontmatter, treating as no-frontmatter")
         return {}, raw_text
 
     if not isinstance(meta, dict):
         # YAML parsed to a scalar or list — not useful metadata
         return {}, raw_text
 
-    return meta, body
+    return meta, body  # type: ignore[return-value]
 
 
 # -- Skip heuristics -------------------------------------------------------
 
 def _should_skip(
     file_path: str,
-    meta: Dict,
+    meta: Dict[str, Any],
     body: str,
     source_type: str,
     exclude_dirs: Set[str],
@@ -179,31 +179,11 @@ def _strip_hugo_shortcodes(text: str) -> str:
 def map_file_path_to_url(file_path: str, source_type: str) -> str:
     """Convert a repo-relative file path to its public GitLab URL.
 
-    Handbook:
-        content/handbook/values/_index.md
-        → https://handbook.gitlab.com/handbook/values/
-
-    Direction:
-        source/direction/create/_index.html.md.erb
-        → https://about.gitlab.com/direction/create/
-
-    This will be fully implemented in ingestion/url_mapper.py (Step 3).
-    For now returns a best-effort URL so the rest of the pipeline
-    can run end to end without blocking on this module.
+    Delegates to ingestion.url_mapper for the real implementation.
+    This thin wrapper exists so existing imports from md_loader keep working.
     """
-    if source_type == "handbook":
-        # strip "content/" prefix, strip filename
-        url_path = file_path.replace("content/", "", 1)
-        # strip _index.md or similar filename
-        url_path = re.sub(r"/[^/]*\.md$", "/", url_path)
-        return f"https://handbook.gitlab.com/{url_path}"
-
-    elif source_type == "direction":
-        url_path = file_path.replace("source/", "", 1)
-        url_path = re.sub(r"/[^/]*\.(md|html\.md|html\.md\.erb)$", "/", url_path)
-        return f"https://about.gitlab.com/{url_path}"
-
-    return ""
+    from ingestion.url_mapper import map_file_path_to_url as _real_mapper
+    return _real_mapper(file_path, source_type)
 
 
 # -- Main discovery + loading -----------------------------------------------

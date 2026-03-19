@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, asdict, field
-from typing import List, Optional
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, Tuple
 
 
 # Rough multiplier: avg English word ≈ 1.3 tokens for most embedding models.
@@ -36,7 +36,7 @@ class Chunk:
     source_url: str              # public GitLab URL for citation
     page_title: str              # from YAML frontmatter "title" field
     heading_path: str            # "Collaboration > Kindness"
-    heading_parts: tuple         # ("Collaboration", "Kindness") — for filtering/UI hierarchy
+    heading_parts: Tuple[str, ...]  # ("Collaboration", "Kindness") — for filtering/UI hierarchy
     heading_level: int           # deepest heading level in this chunk (2, 3, 4...)
     source_type: str             # "handbook" or "direction"
     section: str                 # top-level slug: "values", "engineering", etc.
@@ -45,7 +45,7 @@ class Chunk:
     file_path: str               # relative to repo root
     chunk_index: int = 0         # position within the source file (0-based)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Serialize to a plain dict suitable for JSON output."""
         return asdict(self)
 
@@ -57,12 +57,12 @@ class Chunk:
         return json.dumps(self.to_dict(), separators=(",", ":"), ensure_ascii=False)
 
     @classmethod
-    def from_dict(cls, d: dict) -> Chunk:
+    def from_dict(cls, d: Dict[str, Any]) -> Chunk:
         """Reconstruct a Chunk from a dict (e.g. read back from JSONL)."""
         d = dict(d)
         # heading_parts stored as list in JSON, convert back to tuple
         if "heading_parts" in d and isinstance(d["heading_parts"], list):
-            d["heading_parts"] = tuple(d["heading_parts"])
+            d["heading_parts"] = tuple(d["heading_parts"])  # type: ignore[arg-type]
         return cls(**d)
 
     @classmethod
