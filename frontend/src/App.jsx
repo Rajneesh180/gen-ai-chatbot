@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Bot, User, Send } from 'lucide-react';
+import { Gitlab, User, Send } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -101,7 +101,7 @@ function App() {
       <div className="glass-panel">
         <header className="header">
           <div className="header-icon" style={{ display: 'flex', alignItems: 'center' }}>
-            <Bot size={38} color="#a855f7" strokeWidth={1.5} />
+            <Gitlab size={38} color="#fc6d26" strokeWidth={1.5} />
           </div>
           <div>
             <h1 className="header-title">GitLab Knowledge AI</h1>
@@ -112,7 +112,7 @@ function App() {
         <div className="chat-container">
           {messages.length === 0 && (
             <div className="message bot" style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ marginTop: '2px' }}><Bot size={24} color="#a855f7" /></div>
+              <div style={{ marginTop: '2px' }}><Gitlab size={24} color="#fc6d26" /></div>
               <div>
                 <p>Hi! I'm the **GitLab Knowledge Assistant**. Ask me anything about GitLab's core values, remote work, or product development flows.</p>
               </div>
@@ -121,7 +121,7 @@ function App() {
           
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.role}`} style={{ display: 'flex', gap: '12px', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-              {msg.role === 'bot' && <div style={{ marginTop: '2px', minWidth: '24px' }}><Bot size={24} color="#a855f7" /></div>}
+              {msg.role === 'bot' && <div style={{ marginTop: '2px', minWidth: '24px' }}><Gitlab size={24} color="#fc6d26" /></div>}
               
               <div style={{ maxWidth: '100%' }}>
                 <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -146,7 +146,7 @@ function App() {
           
           {isLoading && (
             <div className="message bot" style={{ display: 'flex', gap: '12px' }}>
-              <div style={{ marginTop: '2px' }}><Bot size={24} color="#a855f7" /></div>
+              <div style={{ marginTop: '2px' }}><Gitlab size={24} color="#fc6d26" /></div>
               <div className="typing-indicator" style={{ padding: '4px 0' }}>
                 <div className="typing-dot"></div>
                 <div className="typing-dot"></div>
