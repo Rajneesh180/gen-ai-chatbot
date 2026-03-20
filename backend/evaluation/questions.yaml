@@ -1,0 +1,63 @@
+# Benchmark questions for evaluating the GitLab Knowledge Chatbot
+# Each question targets a specific handbook/direction topic.
+
+questions:
+  - question: "What are GitLab's core values?"
+    expected_topic: "values"
+
+  - question: "How does GitLab define collaboration?"
+    expected_topic: "values"
+
+  - question: "What is GitLab's approach to remote work?"
+    expected_topic: "remote-work"
+
+  - question: "What does 'everyone can contribute' mean at GitLab?"
+    expected_topic: "values"
+
+  - question: "How are performance reviews conducted at GitLab?"
+    expected_topic: "people-group"
+
+  - question: "What is GitLab's hiring process?"
+    expected_topic: "hiring"
+
+  - question: "What is the product development flow at GitLab?"
+    expected_topic: "product"
+
+  - question: "How does GitLab handle incident management?"
+    expected_topic: "engineering"
+
+  - question: "What is GitLab's security practices for code review?"
+    expected_topic: "security"
+
+  - question: "What are GitLab's communication guidelines?"
+    expected_topic: "communication"
+
+  - question: "How does GitLab approach diversity, inclusion, and belonging?"
+    expected_topic: "values"
+
+  - question: "What is TeamOps?"
+    expected_topic: "teamops"
+
+  - question: "What is GitLab's strategy for the DevSecOps platform?"
+    expected_topic: "direction"
+
+  - question: "How does GitLab decide what to build next?"
+    expected_topic: "product"
+
+  - question: "What are the engineering department's key metrics?"
+    expected_topic: "engineering"
+
+  - question: "How does GitLab handle on-call rotations?"
+    expected_topic: "engineering"
+
+  - question: "What is GitLab's approach to async communication?"
+    expected_topic: "communication"
+
+  - question: "What are the competencies expected of a senior engineer at GitLab?"
+    expected_topic: "engineering"
+
+  - question: "How does GitLab manage its OKR process?"
+    expected_topic: "company"
+
+  - question: "What is the direction for GitLab's CI/CD capabilities?"
+    expected_topic: "direction"

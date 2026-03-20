@@ -17,8 +17,8 @@ import time
 from pathlib import Path
 from typing import List
 
-from ingestion.chunker import chunk_all
-from ingestion.md_loader import MarkdownDocument, load_documents
+from backend.ingestion.chunker import chunk_all
+from backend.ingestion.md_loader import MarkdownDocument, load_documents
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -178,14 +178,14 @@ def run_chunk() -> None:
 
 def run_embed() -> None:
     _check_prerequisites("embed")
-    # TODO: implement once embedder.py is built
-    print("[EMBED] not yet implemented — skipping")
+    from backend.ingestion.embedder import run_embed as _run_embed
+    _run_embed()
 
 
 def run_index() -> None:
     _check_prerequisites("index")
-    # TODO: implement once indexer.py is built
-    print("[INDEX] not yet implemented — skipping")
+    from backend.ingestion.indexer import run_index as _run_index
+    _run_index()
 
 
 def run_validate() -> None:
