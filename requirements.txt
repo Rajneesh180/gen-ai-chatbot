@@ -1,6 +1,11 @@
+groq>=0.28.0
+faiss-cpu>=1.7.4
+rank-bm25>=0.2.2
+pyyaml>=6.0
+numpy<2.0.0
 sentence-transformers
-faiss-cpu
-rank-bm25
-google-generativeai
-pyyaml
-python-dotenv
+transformers
+fastapi
+uvicorn[standard]
+pydantic
+httpx
