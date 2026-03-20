@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Bot, User, Send } from 'lucide-react';
 import './index.css';
 
 function App() {
@@ -8,7 +9,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
   
-  // Auto-scroll to bottom
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -24,13 +24,10 @@ function App() {
     const userQuery = input.trim();
     setInput('');
     
-    // Create new temporary message array
-    const newMessages = [...messages, { role: 'user', content: userQuery }];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, { role: 'user', content: userQuery }]);
     setIsLoading(true);
 
     try {
-      // Build history
       const history = [];
       for (let i = 0; i < messages.length; i += 2) {
         if (messages[i] && messages[i+1]) {
@@ -40,17 +37,13 @@ function App() {
 
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: userQuery,
-          history: history,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: userQuery, history: history }),
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Network response was not ok');
       }
 
       setMessages(prev => [...prev, { role: 'bot', content: '', sources: [] }]);
@@ -86,16 +79,18 @@ function App() {
                 } else if (data.type === 'done') {
                   done = true;
                 }
-              } catch (e) {
-                // partial chunks or parsing errors, ignore
-              }
+              } catch (e) { }
             }
           });
         }
       }
     } catch (error) {
       console.error('Chat error:', error);
-      setMessages(prev => [...prev, { role: 'bot', content: 'Sorry, I encountered an error while processing your request.', sources: [] }]);
+      let errMsg = 'Sorry, an error occurred.';
+      if (error.message.includes('No such file') || error.message.includes('Database Error')) {
+         errMsg = '⚠️ **Database Missing**: The ingestion pipeline has not finished running. Please run `python -m backend.ingestion.run_ingest --from embed` to generate the AI memory context!';
+      }
+      setMessages(prev => [...prev, { role: 'bot', content: errMsg, sources: [] }]);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +100,9 @@ function App() {
     <div className="app-container">
       <div className="glass-panel">
         <header className="header">
-          <div className="header-icon">🦊</div>
+          <div className="header-icon" style={{ display: 'flex', alignItems: 'center' }}>
+            <Bot size={38} color="#a855f7" strokeWidth={1.5} />
+          </div>
           <div>
             <h1 className="header-title">GitLab Knowledge AI</h1>
             <p className="header-subtitle">Intelligent answers grounded in GitLab's Handbook & Direction pages</p>
@@ -114,35 +111,47 @@ function App() {
 
         <div className="chat-container">
           {messages.length === 0 && (
-            <div className="message bot">
-              <p>Hi! I'm the GitLab Knowledge Assistant. Ask me anything about GitLab's core values, remote work, or product development flows.</p>
+            <div className="message bot" style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ marginTop: '2px' }}><Bot size={24} color="#a855f7" /></div>
+              <div>
+                <p>Hi! I'm the **GitLab Knowledge Assistant**. Ask me anything about GitLab's core values, remote work, or product development flows.</p>
+              </div>
             </div>
           )}
           
           {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.role}`}>
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            <div key={idx} className={`message ${msg.role}`} style={{ display: 'flex', gap: '12px', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+              {msg.role === 'bot' && <div style={{ marginTop: '2px', minWidth: '24px' }}><Bot size={24} color="#a855f7" /></div>}
               
-              {msg.sources && msg.sources.length > 0 && (
-                <div className="sources-container">
-                  <div className="sources-title">📚 Sources</div>
-                  <div className="source-badges">
-                    {msg.sources.map((src, sIdx) => (
-                      <a key={sIdx} href={src.url} target="_blank" rel="noreferrer" className="source-badge">
-                        {src.title || new URL(src.url).pathname.split('/').pop() || 'Handbook Page'}
-                      </a>
-                    ))}
+              <div style={{ maxWidth: '100%' }}>
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+                
+                {msg.sources && msg.sources.length > 0 && (
+                  <div className="sources-container">
+                    <div className="sources-title">📚 Sources</div>
+                    <div className="source-badges">
+                      {msg.sources.map((src, sIdx) => (
+                        <a key={sIdx} href={src.url} target="_blank" rel="noreferrer" className="source-badge">
+                          {src.title || new URL(src.url).pathname.split('/').pop() || 'Handbook Page'}
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+              
+              {msg.role === 'user' && <div style={{ marginTop: '2px', minWidth: '24px', opacity: 0.8 }}><User size={24} color="#e0e6ed" /></div>}
             </div>
           ))}
           
           {isLoading && (
-            <div className="message bot typing-indicator">
-              <div className="typing-dot"></div>
-              <div className="typing-dot"></div>
-              <div className="typing-dot"></div>
+            <div className="message bot" style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ marginTop: '2px' }}><Bot size={24} color="#a855f7" /></div>
+              <div className="typing-indicator" style={{ padding: '4px 0' }}>
+                <div className="typing-dot"></div>
+                <div className="typing-dot"></div>
+                <div className="typing-dot"></div>
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -158,6 +167,7 @@ function App() {
             disabled={isLoading}
           />
           <button type="submit" className="send-btn" disabled={!input.trim() || isLoading}>
+            <Send size={18} style={{ marginRight: '8px' }} />
             Send
           </button>
         </form>

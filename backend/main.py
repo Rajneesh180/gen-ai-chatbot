@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
 
 # Ensure project root is on sys.path
@@ -59,7 +59,7 @@ async def chat_endpoint(req: ChatRequest):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return {"error": str(e)}
+        return JSONResponse(status_code=500, content={"detail": f"Database Error: {str(e)}"})
 
 if __name__ == "__main__":
     import uvicorn
