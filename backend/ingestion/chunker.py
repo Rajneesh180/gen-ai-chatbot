@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from ingestion.md_loader import MarkdownDocument, map_file_path_to_url
-from ingestion.schema import Chunk, estimate_tokens
+from backend.ingestion.md_loader import MarkdownDocument, map_file_path_to_url
+from backend.ingestion.schema import Chunk, estimate_tokens
 
 # ---------------------------------------------------------------------------
 # Tunables
@@ -59,7 +59,7 @@ class _RawSection:
     heading_text: str   # "" for preamble
     body: str           # content under this heading (no sub-headings split yet)
     heading_path: str   # "Collaboration > Kindness"
-    heading_parts: tuple  # ("Collaboration", "Kindness")
+    heading_parts: Tuple[str, ...]  # ("Collaboration", "Kindness")
 
 
 # ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ def _find_code_fence_ranges(body: str) -> List[Tuple[int, int]]:
 
     Handles both ``` and ~~~ fences. Unclosed fences extend to EOF.
     """
-    ranges = []
+    ranges: List[Tuple[int, int]] = []
     fence_stack: Optional[int] = None  # start offset of opening fence
 
     for m in _CODE_FENCE_RE.finditer(body):
@@ -146,7 +146,7 @@ def _extract_sections(body: str) -> List[_RawSection]:
             heading_parts=(),
         ))
 
-    for i, (h_start, h_end, level, text) in enumerate(headings):
+    for i, (_h_start, h_end, level, text) in enumerate(headings):
         # extract content: from end of heading line to start of next heading
         if i + 1 < len(headings):
             content = body[h_end: headings[i + 1][0]]
@@ -266,7 +266,7 @@ def _split_section(body: str) -> List[str]:
 # Step 6: Merge tiny fragments
 # ---------------------------------------------------------------------------
 
-def _merge_tiny(chunks: List[dict]) -> List[dict]:
+def _merge_tiny(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Absorb chunks under MERGE_THRESHOLD_TOKENS into their neighbors.
 
     Each dict has keys: content, heading_path, heading_parts, heading_level.
@@ -275,7 +275,7 @@ def _merge_tiny(chunks: List[dict]) -> List[dict]:
     if len(chunks) <= 1:
         return chunks
 
-    merged: List[dict] = []
+    merged: List[Dict[str, Any]] = []
     skip_next = False
 
     for i, chunk in enumerate(chunks):
@@ -310,7 +310,7 @@ def _merge_tiny(chunks: List[dict]) -> List[dict]:
 # Step 7: Overlap stitching
 # ---------------------------------------------------------------------------
 
-def _should_overlap(prev: dict, curr: dict) -> bool:
+def _should_overlap(prev: Dict[str, Any], curr: Dict[str, Any]) -> bool:
     """True if curr should receive a 40-token tail from prev."""
     if prev["file_path"] != curr["file_path"]:
         return False
@@ -328,7 +328,7 @@ def _should_overlap(prev: dict, curr: dict) -> bool:
     return False
 
 
-def _apply_overlap(chunks: List[dict]) -> List[dict]:
+def _apply_overlap(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Stitch 40-token tails between eligible sibling chunks.
 
     Modifies chunk content in place. Does NOT change chunk identity fields.
@@ -373,7 +373,7 @@ def chunk_document(doc: MarkdownDocument) -> List[Chunk]:
         return []
 
     # build intermediate chunk dicts (before merging/overlap)
-    raw_chunks: List[dict] = []
+    raw_chunks: List[Dict[str, Any]] = []
 
     for sec in sections:
         sec_body = _clean_body(sec.body)
@@ -447,14 +447,14 @@ def chunk_document(doc: MarkdownDocument) -> List[Chunk]:
 # Batch helper (for pipeline runner)
 # ---------------------------------------------------------------------------
 
-def chunk_all(docs) -> List[Chunk]:
+def chunk_all(docs: List[MarkdownDocument]) -> List[Chunk]:
     """Chunk an iterable of MarkdownDocuments and print summary stats.
 
     Returns a flat list of all Chunk objects across all documents.
     """
     all_chunks: List[Chunk] = []
     file_count = 0
-    source_counts: dict = {}  # source_type -> (files, chunks)
+    source_counts: Dict[str, Tuple[int, int]] = {}  # source_type -> (files, chunks)
 
     for doc in docs:
         file_count += 1
@@ -473,7 +473,6 @@ def chunk_all(docs) -> List[Chunk]:
         median = token_counts[median_idx]
 
         overlap_count = sum(1 for c in all_chunks if "[...]" in c.text)
-        merge_count = 0  # already logged inline during _merge_tiny
 
         print(f"[CHUNK] SUMMARY: {file_count} files -> {len(all_chunks)} chunks")
         for st, (f, c) in sorted(source_counts.items()):

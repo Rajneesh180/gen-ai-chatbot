@@ -129,7 +129,7 @@ def _should_skip(
             return "SKIP_FILTER"
 
     # 4 — explicitly deprecated content
-    status = meta.get("status", "").lower()
+    status = str(meta.get("status") or "").lower()
     if status in ("deprecated", "archived"):
         return "SKIP_DEPRECATED"
 
@@ -182,7 +182,7 @@ def map_file_path_to_url(file_path: str, source_type: str) -> str:
     Delegates to ingestion.url_mapper for the real implementation.
     This thin wrapper exists so existing imports from md_loader keep working.
     """
-    from ingestion.url_mapper import map_file_path_to_url as _real_mapper
+    from backend.ingestion.url_mapper import map_file_path_to_url as _real_mapper
     return _real_mapper(file_path, source_type)
 
 
