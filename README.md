@@ -1,3 +1,12 @@
+---
+title: Gitlab Knowledge Ai
+emoji: 🏢
+colorFrom: green
+colorTo: red
+sdk: docker
+pinned: false
+---
+
 # GitLab Knowledge AI
 
 RAG chatbot that answers questions about GitLab's internal processes using their public Handbook and Direction pages. Ingests markdown docs, chunks and embeds them, then uses hybrid retrieval (FAISS + BM25) to ground answers in actual content.
