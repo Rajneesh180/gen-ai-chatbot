@@ -1,39 +1,65 @@
-# Environment
+# Environment & secrets
 .env
 *.env
+
+# Python
 __pycache__/
 *.pyc
 .pytest_cache/
+.venv/
+.venv39/
 
-# Data artifacts — all gitignored during development
-# Remove specific lines at final ingestion milestone to commit production artifacts
+# Node
+node_modules/
+frontend/node_modules/
+
+# Data — raw repos and intermediate files
 data/repos/
 data/raw_files.jsonl
 data/skipped_files.jsonl
 data/chunks.jsonl
+data/chunks_full.jsonl
 data/embeddings.npy
 data/embeddings_partial.npy
 data/embed_manifest.json
-data/faiss.index
-data/bm25.pkl
-data/metadata.pkl
 data/validation_report.json
 data/sample_inspection.txt
 data/ingest.log
+data/feedback.jsonl
 
-# Assignment brief
+# Keep these 3 index files (needed for deployment):
+# data/faiss.index
+# data/bm25.pkl
+# data/metadata.pkl
+
+# Assignment brief (not for submission)
 GenAI_Chatbot.pdf
 
-# Design/planning docs (local reference only)
+# Planning/design docs (local reference only)
 DESIGN_PLAN.md
 INGESTION_DESIGN.md
 INGESTION_EXEC_SPEC.md
 IMPLEMENTATION_PLAN.md
 
-# OS
+# Log files
+*.log
+ingestion.log
+
+# OS / IDE
 .DS_Store
 Thumbs.db
-
-# IDE
 .vscode/
 .idea/
+
+# Vite boilerplate
+frontend/README.md
+frontend/public/vite.svg
+frontend/src/assets/react.svg
+
+# AI agent artifacts
+.gemini/
+.agents/
+.agent/
+_agents/
+_agent/
+data/.gitkeep

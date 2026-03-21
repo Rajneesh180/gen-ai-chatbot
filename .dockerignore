@@ -1,0 +1,20 @@
+# Exclude cloned repos (3.4GB, not needed at runtime)
+data/repos/
+
+# Exclude raw data files (only indexes are needed)
+data/chunks.jsonl
+data/embeddings.npy
+
+# Python / Node artifacts
+__pycache__/
+*.pyc
+.venv/
+.venv39/
+node_modules/
+frontend/node_modules/
+
+# Git / IDE
+.git/
+.gitignore
+.env
+*.md

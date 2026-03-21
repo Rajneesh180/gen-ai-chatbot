@@ -20,7 +20,7 @@ from typing import Any, Dict, Tuple
 _WORD_TO_TOKEN_RATIO = 1.3
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Chunk:
     """Single retrieval unit produced by the chunker.
 
