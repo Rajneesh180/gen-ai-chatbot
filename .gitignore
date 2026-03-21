@@ -1,11 +1,19 @@
+# Environment & secrets
 .env
 *.env
+
+# Python
 __pycache__/
 *.pyc
 .pytest_cache/
 .venv/
+.venv39/
+
+# Node
 node_modules/
 frontend/node_modules/
+
+# Data — raw repos and intermediate files
 data/repos/
 data/raw_files.jsonl
 data/skipped_files.jsonl
@@ -19,16 +27,43 @@ data/sample_inspection.txt
 data/ingest.log
 data/feedback.jsonl
 data/eval_results.json
+
+# Keep these 3 index files (needed for deployment):
+# data/faiss.index
+# data/bm25.pkl
+# data/metadata.pkl
+
+# Assignment brief (not for submission)
 GenAI_Chatbot.pdf
+
+# Planning/design docs (local reference only)
+DESIGN_PLAN.md
+INGESTION_DESIGN.md
+INGESTION_EXEC_SPEC.md
+IMPLEMENTATION_PLAN.md
+
+# Log files
 *.log
+ingestion.log
+
+# OS / IDE
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
+# Vite boilerplate
+frontend/README.md
+frontend/public/vite.svg
+frontend/src/assets/react.svg
+
+# AI agent artifacts
 .gemini/
 .agents/
 .agent/
 _agents/
 _agent/
-_dev/
 data/.gitkeep
+
+# Local dev workspace (planning docs, intermediate data, notes)
+_dev/
