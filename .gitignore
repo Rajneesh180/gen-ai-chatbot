@@ -63,3 +63,6 @@ frontend/src/assets/react.svg
 _agents/
 _agent/
 data/.gitkeep
+
+# Local dev workspace (planning docs, intermediate data, notes)
+_dev/
