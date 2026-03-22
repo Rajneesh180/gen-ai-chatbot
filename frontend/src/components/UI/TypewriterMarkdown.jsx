@@ -32,8 +32,8 @@ const TypewriterMarkdown = ({ content, animate = true, minDelay = 5, maxDelay = 
     
     const typeNextChar = () => {
       if (currentIndexRef.current < content.length) {
-        // Just type 1 character at a time for a natural, slower feel
-        const chunkSize = 1;
+        // Process slightly more characters at once for faster typing and better markdown handling
+        const chunkSize = 3;
         currentIndexRef.current = Math.min(currentIndexRef.current + chunkSize, content.length);
         
         setDisplayedContent(content.substring(0, currentIndexRef.current));

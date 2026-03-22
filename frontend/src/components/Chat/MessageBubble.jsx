@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Gitlab, User, ThumbsUp, ThumbsDown, ShieldCheck, ShieldAlert, Info } from 'lucide-react';
+import { Gitlab, User, ThumbsUp, ThumbsDown, ShieldCheck, ShieldAlert, Info, BookOpen } from 'lucide-react';
 import TypewriterMarkdown from '../UI/TypewriterMarkdown';
 import RetrievalPanel from './RetrievalPanel';
 
@@ -68,8 +68,8 @@ const MessageBubble = ({
           <TypewriterMarkdown 
             content={msg.content} 
             animate={isLatestBotMsg} 
-            minDelay={15} 
-            maxDelay={45} 
+            minDelay={2} 
+            maxDelay={8} 
           />
         ) : (
           <div className="markdown-body">
@@ -79,8 +79,8 @@ const MessageBubble = ({
 
         {msg.role === 'bot' && msg.sources && msg.sources.length > 0 && (
           <div className="sources-container">
-            <div className="sources-title">
-              📚 Sources Used
+            <div className="sources-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BookOpen size={18} className="text-primary" /> Sources Used
             </div>
             <div className="source-badges">
               {msg.sources.map((src, sIdx) => (

@@ -1,5 +1,5 @@
 ---
-title: Gitlab Knowledge Ai
+title: GitLab Knowledge AI
 emoji: 🏢
 colorFrom: green
 colorTo: red
@@ -11,13 +11,13 @@ pinned: false
 
 RAG chatbot that answers questions about GitLab's internal processes using their public Handbook and Direction pages. Ingests markdown docs, chunks and embeds them, then uses hybrid retrieval (FAISS + BM25) to ground answers in actual content.
 
-**Live demo**: [https://huggingface.co/spaces/rajneeshrehsaan/gitlab-knowledge-ai](https://huggingface.co/spaces/rajneeshrehsaan/gitlab-knowledge-ai)
+Live demo: https://huggingface.co/spaces/rajneeshrehsaan/gitlab-knowledge-ai
 
 ## How it works
 
 1. Clone GitLab's handbook and direction repos
 2. Walk markdown files, clean and split into heading-aware chunks
-3. Embed with sentence-transformers (`all-MiniLM-L6-v2`) and build FAISS + BM25 indexes
+3. Embed with sentence-transformers (all-MiniLM-L6-v2) and build FAISS + BM25 indexes
 4. At query time, retrieve via hybrid search (semantic + keyword) with reciprocal rank fusion
 5. Pass context to Groq-hosted Llama 3.3 70B for streaming generation
 
@@ -32,7 +32,7 @@ RAG chatbot that answers questions about GitLab's internal processes using their
 
 ## Project structure
 
-```
+```text
 ├── backend/
 │   ├── config.py               # central configuration
 │   ├── main.py                 # FastAPI app + endpoints
