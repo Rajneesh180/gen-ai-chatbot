@@ -66,8 +66,15 @@ const MessageBubble = ({
             <div className="jumping-dot" style={{ animationDelay: '0.2s' }}></div>
             <div className="jumping-dot" style={{ animationDelay: '0.4s' }}></div>
           </div>
+        ) : isLatestBotMsg && isLoading ? (
+          /* During streaming: render as plain text for speed — avoids O(n²)
+             ReactMarkdown re-parsing on every token and prevents partial
+             markdown like [Values](url showing as raw text */
+          <div className="markdown-body typing-active">
+            <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.content}</div>
+          </div>
         ) : (
-          <div className={`markdown-body ${isLatestBotMsg && isLoading ? 'typing-active' : ''}`}>
+          <div className="markdown-body">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
