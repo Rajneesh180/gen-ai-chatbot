@@ -43,6 +43,7 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 _DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 _FEEDBACK_PATH = _DATA_DIR / "feedback.jsonl"
+_QUERY_LOG_PATH = _DATA_DIR / "query_log.jsonl"
 
 # ---------------------------------------------------------------------------
 # Rate Limiter — protects the free-tier quota
@@ -245,6 +246,21 @@ async def chat_endpoint(req: ChatRequest):
         chunks = retrieve(req.query)
         sources = extract_sources(chunks)
         retrieval_details = _build_retrieval_details(chunks)
+
+        # --- log query ---
+        try:
+            _DATA_DIR.mkdir(parents=True, exist_ok=True)
+            with open(_QUERY_LOG_PATH, "a", encoding="utf-8") as f:
+                log_entry = {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "query": req.query,
+                    "num_sources": len(sources),
+                    "top_source": sources[0]["title"] if sources else "",
+                }
+                f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
+
         prompt = build_prompt(
             query=req.query,
             chunks=chunks,
@@ -301,6 +317,58 @@ async def chat_endpoint(req: ChatRequest):
         import traceback
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"detail": f"Server Error: {str(e)}"})
+
+
+# ---------------------------------------------------------------------------
+# Admin analytics endpoint
+# ---------------------------------------------------------------------------
+from collections import Counter
+
+@app.get("/api/admin/analytics")
+def admin_analytics():
+    """Return aggregate analytics: query count, topics, feedback, timeline."""
+    queries = []
+    if _QUERY_LOG_PATH.exists():
+        for line in _QUERY_LOG_PATH.read_text(encoding="utf-8").strip().split("\n"):
+            if line.strip():
+                try:
+                    queries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+
+    feedbacks = []
+    if _FEEDBACK_PATH.exists():
+        for line in _FEEDBACK_PATH.read_text(encoding="utf-8").strip().split("\n"):
+            if line.strip():
+                try:
+                    feedbacks.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+
+    # Top queried topics (top source pages)
+    source_counts = Counter(q.get("top_source", "Unknown") for q in queries if q.get("top_source"))
+    top_topics = [{"topic": k, "count": v} for k, v in source_counts.most_common(10)]
+
+    # Feedback breakdown
+    up = sum(1 for f in feedbacks if f.get("rating") == "up")
+    down = sum(1 for f in feedbacks if f.get("rating") == "down")
+
+    # Queries per day
+    day_counts = Counter(q.get("timestamp", "")[:10] for q in queries)
+    daily_volume = [{"date": k, "count": v} for k, v in sorted(day_counts.items())]
+
+    # Recent queries
+    recent = queries[-20:][::-1]
+
+    return {
+        "total_queries": len(queries),
+        "total_feedback": len(feedbacks),
+        "feedback_up": up,
+        "feedback_down": down,
+        "top_topics": top_topics,
+        "daily_volume": daily_volume,
+        "recent_queries": recent,
+    }
 
 
 # ---------------------------------------------------------------------------

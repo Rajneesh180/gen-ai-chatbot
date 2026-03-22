@@ -1,7 +1,7 @@
 import React from 'react';
-import { Gitlab, Download, Trash2, LogOut } from 'lucide-react';
+import { Gitlab, Download, Trash2, LogOut, BarChart3 } from 'lucide-react';
 
-const Header = ({ onExport, onClear, hasMessages, username, onLogout }) => {
+const Header = ({ onExport, onClear, hasMessages, username, onLogout, onAdmin }) => {
   return (
     <header className="header premium-header">
       <div className="header-brand">
@@ -28,6 +28,11 @@ const Header = ({ onExport, onClear, hasMessages, username, onLogout }) => {
               <span>Export</span>
             </button>
           </>
+        )}
+        {username && (
+          <button className="export-btn" onClick={onAdmin} title="Analytics Dashboard">
+            <BarChart3 size={18} />
+          </button>
         )}
         {username && (
           <button className="export-btn logout-btn" onClick={onLogout} title="Sign Out">

@@ -4,6 +4,7 @@ import Header from './components/Layout/Header';
 import ChatInput from './components/Chat/ChatInput';
 import MessageBubble from './components/Chat/MessageBubble';
 import LoginScreen from './components/Auth/LoginScreen';
+import AdminDashboard from './components/Admin/AdminDashboard';
 import { useChatStream } from './hooks/useChatStream';
 import './index.css';
 
@@ -20,6 +21,7 @@ const TOPIC_STARTERS = [
 
 function App() {
   const [username, setUsername] = useState(() => localStorage.getItem(USER_KEY) || '');
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const handleLogin = (name) => {
     localStorage.setItem(USER_KEY, name);
@@ -86,10 +88,20 @@ function App() {
     return <LoginScreen onLogin={handleLogin} />;
   }
 
+  if (showAdmin) {
+    return (
+      <div className="app-container">
+        <div className="glass-panel main-glass">
+          <AdminDashboard onBack={() => setShowAdmin(false)} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <div className="glass-panel main-glass">
-        <Header onExport={handleExport} onClear={clearChat} hasMessages={messages.length > 0} username={username} onLogout={handleLogout} />
+        <Header onExport={handleExport} onClear={clearChat} hasMessages={messages.length > 0} username={username} onLogout={handleLogout} onAdmin={() => setShowAdmin(true)} />
 
         <div className="chat-container">
           {messages.length === 0 && (
