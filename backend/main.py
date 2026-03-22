@@ -372,6 +372,56 @@ def admin_analytics():
 
 
 # ---------------------------------------------------------------------------
+# Auto-suggest endpoint
+# ---------------------------------------------------------------------------
+_BUILTIN_SUGGESTIONS = [
+    "What are GitLab's core values?",
+    "How does remote work function at GitLab?",
+    "What is the product development flow?",
+    "How are performance reviews conducted?",
+    "What are the security practices for code review?",
+    "Explain the significance of async communication.",
+    "How does GitLab handle incident management?",
+    "What is the handbook-first approach?",
+    "How are engineering team retrospectives run?",
+    "What is GitLab's approach to transparency?",
+]
+
+@app.get("/api/suggest")
+def suggest(q: str = ""):
+    """Return up to 6 typeahead suggestions matching the query prefix."""
+    prefix = q.strip().lower()
+    if not prefix:
+        return {"suggestions": []}
+
+    # Collect unique past queries
+    past_queries = set()
+    if _QUERY_LOG_PATH.exists():
+        try:
+            for line in _QUERY_LOG_PATH.read_text(encoding="utf-8").strip().split("\n"):
+                if line.strip():
+                    entry = json.loads(line)
+                    past_queries.add(entry.get("query", ""))
+        except Exception:
+            pass
+
+    candidates = list(past_queries) + _BUILTIN_SUGGESTIONS
+    seen = set()
+    matches = []
+    for c in candidates:
+        low = c.lower()
+        if low in seen or not c.strip():
+            continue
+        seen.add(low)
+        if prefix in low:
+            matches.append(c)
+        if len(matches) >= 6:
+            break
+
+    return {"suggestions": matches}
+
+
+# ---------------------------------------------------------------------------
 # Serve frontend static files in production (Docker / HuggingFace Spaces)
 # The React build output lives at frontend/dist after `npm run build`.
 # ---------------------------------------------------------------------------

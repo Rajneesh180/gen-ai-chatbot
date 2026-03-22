@@ -522,6 +522,41 @@ a:hover {
   align-items: center;
 }
 
+/* Auto-suggest dropdown */
+.suggest-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+
+.suggest-item {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.suggest-item:last-child {
+  border-bottom: none;
+}
+
+.suggest-item:hover,
+.suggest-item-active {
+  background: rgba(252, 109, 38, 0.1);
+  color: var(--text-primary);
+}
+
 .chat-input {
   width: 100%;
   background: rgba(0,0,0,0.3);
