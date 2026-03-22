@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import re
+import threading
 from typing import Optional
 from pathlib import Path
 from collections import deque
@@ -369,6 +370,77 @@ def admin_analytics():
         "daily_volume": daily_volume,
         "recent_queries": recent,
     }
+
+
+# ---------------------------------------------------------------------------
+# Scheduled re-ingestion endpoint
+# ---------------------------------------------------------------------------
+_ingest_status = {
+    "running": False,
+    "last_run": None,
+    "last_result": None,
+    "stages_completed": [],
+    "error": None,
+}
+_ingest_lock = threading.Lock()
+
+
+def _run_ingestion_pipeline(stages: list[str]):
+    """Run ingestion stages in background thread."""
+    from backend.ingestion.run_ingest import STAGE_FUNCS
+    import time as _time
+
+    _ingest_status["stages_completed"] = []
+    _ingest_status["error"] = None
+    t0 = _time.monotonic()
+
+    try:
+        for stage_name in stages:
+            logger.info(f"[REINGEST] Starting stage: {stage_name}")
+            STAGE_FUNCS[stage_name]()
+            _ingest_status["stages_completed"].append(stage_name)
+            logger.info(f"[REINGEST] Completed stage: {stage_name}")
+
+        elapsed = round(_time.monotonic() - t0, 1)
+        _ingest_status["last_result"] = f"Success — {len(stages)} stages in {elapsed}s"
+        logger.info(f"[REINGEST] Pipeline finished in {elapsed}s")
+    except Exception as e:
+        _ingest_status["error"] = str(e)
+        _ingest_status["last_result"] = f"Failed at stage '{_ingest_status['stages_completed'][-1] if _ingest_status['stages_completed'] else stages[0]}': {e}"
+        logger.error(f"[REINGEST] Pipeline error: {e}")
+    finally:
+        _ingest_status["running"] = False
+        _ingest_status["last_run"] = datetime.utcnow().isoformat()
+
+
+@app.post("/api/admin/reingest")
+def trigger_reingest(stages: str = "walk,chunk,embed,index"):
+    """Trigger a re-ingestion pipeline run in the background.
+
+    Query param `stages` is a comma-separated list of stages to run.
+    Default: walk,chunk,embed,index (skips clone).
+    """
+    valid_stages = ["clone", "walk", "chunk", "embed", "index"]
+    requested = [s.strip() for s in stages.split(",") if s.strip()]
+    for s in requested:
+        if s not in valid_stages:
+            return JSONResponse(status_code=400, content={"detail": f"Invalid stage: {s}"})
+
+    with _ingest_lock:
+        if _ingest_status["running"]:
+            return JSONResponse(status_code=409, content={"detail": "Ingestion already running", "status": _ingest_status})
+        _ingest_status["running"] = True
+
+    thread = threading.Thread(target=_run_ingestion_pipeline, args=(requested,), daemon=True)
+    thread.start()
+
+    return {"message": f"Ingestion started with stages: {requested}", "status": _ingest_status}
+
+
+@app.get("/api/admin/reingest/status")
+def reingest_status():
+    """Check the status of the re-ingestion pipeline."""
+    return _ingest_status
 
 
 # ---------------------------------------------------------------------------
