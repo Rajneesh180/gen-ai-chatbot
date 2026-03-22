@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Gitlab, User, ThumbsUp, ThumbsDown, ShieldCheck, ShieldAlert, Info, BookOpen } from 'lucide-react';
+import { Gitlab, User, ThumbsUp, ThumbsDown, ShieldCheck, ShieldAlert, Info, BookOpen, Highlighter } from 'lucide-react';
 import RetrievalPanel from './RetrievalPanel';
 
 const MessageBubble = ({ 
@@ -41,6 +41,38 @@ const MessageBubble = ({
     );
   };
 
+  // Citation highlighting state: tracks which source index is highlighted
+  const [highlightedSource, setHighlightedSource] = useState(null);
+
+  // Build highlight phrases from retrieval details for the active source
+  const highlightPhrases = useMemo(() => {
+    if (highlightedSource === null || !msg.retrievalDetails) return [];
+    const detail = msg.retrievalDetails[highlightedSource];
+    if (!detail?.snippet) return [];
+    // Use snippet words (cleaned) as highlight phrases — take meaningful chunks
+    const raw = detail.snippet.replace(/\.{3}$/, '').replace(/^"|"|'|'/g, '').trim();
+    // Split into sentences/phrases for better matching
+    return raw.split(/[.!?;]+/).map(s => s.trim()).filter(s => s.length > 15);
+  }, [highlightedSource, msg.retrievalDetails]);
+
+  // Highlight matching text in a string
+  const applyHighlight = (text) => {
+    if (!highlightPhrases.length || typeof text !== 'string') return text;
+    let result = text;
+    for (const phrase of highlightPhrases) {
+      const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(`(${escaped})`, 'gi');
+      if (re.test(result)) {
+        // Return React elements with highlighting 
+        const parts = result.split(re);
+        return parts.map((part, i) =>
+          re.test(part) ? <mark key={i} className="citation-highlight">{part}</mark> : part
+        );
+      }
+    }
+    return text;
+  };
+
   return (
     <div className={`message-wrapper ${msg.role} fade-in-up`}>
       <div className={`avatar ${msg.role}`}>
@@ -74,7 +106,7 @@ const MessageBubble = ({
             <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{msg.content}</div>
           </div>
         ) : (
-          <div className="markdown-body">
+          <div className={`markdown-body ${highlightedSource !== null ? 'has-highlights' : ''}`}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
@@ -84,6 +116,20 @@ const MessageBubble = ({
                       {children}
                     </a>
                   )
+                },
+                p({node, children, ...props}) {
+                  if (!highlightPhrases.length) return <p {...props}>{children}</p>;
+                  const highlighted = React.Children.map(children, child =>
+                    typeof child === 'string' ? applyHighlight(child) : child
+                  );
+                  return <p {...props}>{highlighted}</p>;
+                },
+                li({node, children, ...props}) {
+                  if (!highlightPhrases.length) return <li {...props}>{children}</li>;
+                  const highlighted = React.Children.map(children, child =>
+                    typeof child === 'string' ? applyHighlight(child) : child
+                  );
+                  return <li {...props}>{highlighted}</li>;
                 },
                 code({node, inline, className, children, ...props}) {
                   const match = /language-(\w+)/.exec(className || '')
@@ -122,9 +168,20 @@ const MessageBubble = ({
             </div>
             <div className="source-badges">
               {msg.sources.map((src, sIdx) => (
-                <a key={sIdx} href={src.url} target="_blank" rel="noreferrer" className="source-badge">
-                  {src.title || 'Handbook Page'}
-                </a>
+                <span key={sIdx} className="source-badge-wrap">
+                  <a href={src.url} target="_blank" rel="noreferrer" className="source-badge">
+                    {src.title || 'Handbook Page'}
+                  </a>
+                  {msg.retrievalDetails && msg.retrievalDetails[sIdx] && (
+                    <button
+                      className={`cite-highlight-btn ${highlightedSource === sIdx ? 'active' : ''}`}
+                      title={highlightedSource === sIdx ? 'Clear highlight' : 'Highlight in answer'}
+                      onClick={() => setHighlightedSource(highlightedSource === sIdx ? null : sIdx)}
+                    >
+                      <Highlighter size={12} />
+                    </button>
+                  )}
+                </span>
               ))}
             </div>
             

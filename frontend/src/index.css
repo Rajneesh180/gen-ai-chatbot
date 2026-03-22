@@ -377,6 +377,48 @@ a:hover {
   color: white;
 }
 
+.source-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.cite-highlight-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: none;
+  padding: 6px 8px;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.cite-highlight-btn:hover {
+  background: rgba(252, 109, 38, 0.15);
+  color: var(--accent);
+}
+
+.cite-highlight-btn.active {
+  background: rgba(252, 109, 38, 0.25);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.source-badge-wrap .source-badge {
+  border-radius: 6px 0 0 6px;
+}
+
+.citation-highlight {
+  background: rgba(252, 109, 38, 0.3);
+  color: #fff;
+  padding: 1px 3px;
+  border-radius: 3px;
+  border-bottom: 2px solid var(--accent);
+}
+
 /* Transparency Section */
 .transparency-section {
   margin-top: 16px;
