@@ -1,10 +1,13 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Gitlab, Database, Brain, Search, Cpu } from 'lucide-react';
 import Header from './components/Layout/Header';
 import ChatInput from './components/Chat/ChatInput';
 import MessageBubble from './components/Chat/MessageBubble';
+import LoginScreen from './components/Auth/LoginScreen';
 import { useChatStream } from './hooks/useChatStream';
 import './index.css';
+
+const USER_KEY = 'gitlab-chat-user';
 
 const TOPIC_STARTERS = [
   "What are GitLab's core values?",
@@ -16,6 +19,18 @@ const TOPIC_STARTERS = [
 ];
 
 function App() {
+  const [username, setUsername] = useState(() => localStorage.getItem(USER_KEY) || '');
+
+  const handleLogin = (name) => {
+    localStorage.setItem(USER_KEY, name);
+    setUsername(name);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(USER_KEY);
+    setUsername('');
+  };
+
   const {
     messages,
     input,
@@ -26,7 +41,7 @@ function App() {
     toggleDetails,
     stopGenerating,
     clearChat
-  } = useChatStream();
+  } = useChatStream(username);
 
   const messagesEndRef = useRef(null);
   
@@ -67,10 +82,14 @@ function App() {
     URL.revokeObjectURL(url);
   };
 
+  if (!username) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   return (
     <div className="app-container">
       <div className="glass-panel main-glass">
-        <Header onExport={handleExport} onClear={clearChat} hasMessages={messages.length > 0} />
+        <Header onExport={handleExport} onClear={clearChat} hasMessages={messages.length > 0} username={username} onLogout={handleLogout} />
 
         <div className="chat-container">
           {messages.length === 0 && (

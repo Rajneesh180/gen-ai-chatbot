@@ -2,27 +2,36 @@ import { useState, useRef, useEffect } from 'react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : '';
 
-const STORAGE_KEY = 'gitlab-chat-messages';
+const STORAGE_PREFIX = 'gitlab-chat-';
 
-function loadSavedMessages() {
+function getStorageKey(username) {
+  return STORAGE_PREFIX + (username || 'anonymous');
+}
+
+function loadSavedMessages(username) {
   try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey(username));
     if (raw) return JSON.parse(raw);
   } catch { /* ignore corrupt data */ }
   return [];
 }
 
-export const useChatStream = () => {
-  const [messages, setMessages] = useState(loadSavedMessages);
+export const useChatStream = (username) => {
+  const [messages, setMessages] = useState(() => loadSavedMessages(username));
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Persist messages to sessionStorage on every change
+  // Reload messages when username changes
+  useEffect(() => {
+    setMessages(loadSavedMessages(username));
+  }, [username]);
+
+  // Persist messages to localStorage on every change (keyed by username)
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      localStorage.setItem(getStorageKey(username), JSON.stringify(messages));
     } catch { /* quota exceeded — ignore */ }
-  }, [messages]);
+  }, [messages, username]);
   
   // Abort controller reference to cancel streams
   const abortControllerRef = useRef(null);

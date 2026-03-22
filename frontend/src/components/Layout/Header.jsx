@@ -1,7 +1,7 @@
 import React from 'react';
-import { Gitlab, Download, Trash2 } from 'lucide-react';
+import { Gitlab, Download, Trash2, LogOut } from 'lucide-react';
 
-const Header = ({ onExport, onClear, hasMessages }) => {
+const Header = ({ onExport, onClear, hasMessages, username, onLogout }) => {
   return (
     <header className="header premium-header">
       <div className="header-brand">
@@ -13,18 +13,28 @@ const Header = ({ onExport, onClear, hasMessages }) => {
           <p className="header-subtitle">Intelligent answers from Handbook & Direction</p>
         </div>
       </div>
-      {hasMessages && (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="export-btn" onClick={onClear} title="Clear Chat">
-            <Trash2 size={18} />
-            <span>Clear</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {username && (
+          <span className="user-badge">{username}</span>
+        )}
+        {hasMessages && (
+          <>
+            <button className="export-btn" onClick={onClear} title="Clear Chat">
+              <Trash2 size={18} />
+              <span>Clear</span>
+            </button>
+            <button className="export-btn" onClick={onExport} title="Export Chat">
+              <Download size={18} />
+              <span>Export</span>
+            </button>
+          </>
+        )}
+        {username && (
+          <button className="export-btn logout-btn" onClick={onLogout} title="Sign Out">
+            <LogOut size={18} />
           </button>
-          <button className="export-btn" onClick={onExport} title="Export Chat">
-            <Download size={18} />
-            <span>Export</span>
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 };

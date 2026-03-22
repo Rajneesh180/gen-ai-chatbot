@@ -637,6 +637,138 @@ a:hover {
   background: rgba(239, 68, 68, 0.4) !important;
 }
 
+/* Login Screen */
+.login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg-gradient);
+  padding: 24px;
+}
+
+.login-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.login-logo {
+  margin-bottom: 16px;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.login-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 32px;
+  line-height: 1.5;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+}
+
+.login-input-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.login-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+}
+
+.login-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.login-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.login-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.login-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.login-note {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-top: 20px;
+  opacity: 0.7;
+}
+
+/* User Badge */
+.user-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(252, 109, 38, 0.1);
+  border: 1px solid rgba(252, 109, 38, 0.25);
+  color: var(--accent);
+}
+
+.logout-btn {
+  opacity: 0.7;
+}
+
+.logout-btn:hover {
+  opacity: 1;
+}
+
 /* Powered-by Footer */
 .powered-by-footer {
   display: flex;
