@@ -301,6 +301,17 @@ body {
   border-radius: 0 4px 4px 0;
 }
 
+/* Link Styling — GitLab orange for all hyperlinks */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
 /* Markdown Styling */
 .markdown-body { font-size: 0.95rem; }
 .markdown-body p { margin-bottom: 0.8em; }
