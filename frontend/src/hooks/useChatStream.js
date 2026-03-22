@@ -86,9 +86,10 @@ export const useChatStream = () => {
 
     try {
       const history = [];
-      for (let i = 0; i < messages.length; i += 2) {
-        if (messages[i] && messages[i+1]) {
-           history.push([messages[i].content, messages[i+1].content]);
+      // Build role-aware pairs: each user message paired with the following bot response
+      for (let i = 0; i < messages.length; i++) {
+        if (messages[i].role === 'user' && messages[i + 1]?.role === 'bot' && messages[i + 1].content) {
+          history.push([messages[i].content, messages[i + 1].content]);
         }
       }
 

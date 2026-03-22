@@ -96,6 +96,7 @@ def format_history(history: List[Tuple[str, str]], max_turns: int = 4) -> str:
 
     Each turn is a (user_message, assistant_response) tuple.
     Only includes the last `max_turns` exchanges to keep prompt concise.
+    Long assistant answers are truncated to avoid blowing up the context.
     """
     if not history:
         return ""
@@ -104,7 +105,11 @@ def format_history(history: List[Tuple[str, str]], max_turns: int = 4) -> str:
     parts: List[str] = []
     for user_msg, assistant_msg in recent:
         parts.append(f"User: {user_msg}")
-        parts.append(f"Assistant: {assistant_msg}")
+        # Truncate long assistant answers to keep prompt lean
+        trimmed = assistant_msg[:600]
+        if len(assistant_msg) > 600:
+            trimmed += " [...]"
+        parts.append(f"Assistant: {trimmed}")
 
     return "\n".join(parts)
 

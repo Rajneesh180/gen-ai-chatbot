@@ -120,6 +120,7 @@ function App() {
           onSubmit={handleSubmit} 
           isLoading={isLoading} 
           onStop={stopGenerating}
+          contextTurns={Math.min(4, Math.floor(messages.filter(m => m.role === 'user').length))}
         />
 
         <div className="powered-by-footer">

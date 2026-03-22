@@ -1,8 +1,8 @@
 import React from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import { Send, Square } from 'lucide-react';
+import { Send, Square, Brain } from 'lucide-react';
 
-const ChatInput = ({ input, setInput, onSubmit, isLoading, onStop }) => {
+const ChatInput = ({ input, setInput, onSubmit, isLoading, onStop, contextTurns = 0 }) => {
   const handleKeyDown = (e) => {
     // Submit on Enter (unless Shift is held for new line)
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -13,6 +13,11 @@ const ChatInput = ({ input, setInput, onSubmit, isLoading, onStop }) => {
 
   return (
     <form className="input-area" onSubmit={onSubmit}>
+      {contextTurns > 0 && (
+        <div className="context-indicator">
+          <Brain size={12} /> Using {contextTurns} previous turn{contextTurns > 1 ? 's' : ''} as context
+        </div>
+      )}
       <div className="input-wrapper">
         <TextareaAutosize
           className="chat-input"

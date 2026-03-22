@@ -504,6 +504,18 @@ a:hover {
   background: rgba(0,0,0,0.2);
 }
 
+/* Context memory indicator */
+.context-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  padding-left: 4px;
+  opacity: 0.7;
+}
+
 .input-wrapper {
   position: relative;
   display: flex;
