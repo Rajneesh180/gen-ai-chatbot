@@ -4,6 +4,7 @@ rank-bm25>=0.2.2
 pyyaml>=6.0
 numpy<2.0.0
 sentence-transformers
+transformers
 fastapi
 uvicorn[standard]
 pydantic
