@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Gitlab, User, ThumbsUp, ThumbsDown, ShieldCheck, ShieldAlert, Info, BookOpen } from 'lucide-react';
-import TypewriterMarkdown from '../UI/TypewriterMarkdown';
 import RetrievalPanel from './RetrievalPanel';
 
 const MessageBubble = ({ 
@@ -64,16 +66,38 @@ const MessageBubble = ({
             <div className="jumping-dot" style={{ animationDelay: '0.2s' }}></div>
             <div className="jumping-dot" style={{ animationDelay: '0.4s' }}></div>
           </div>
-        ) : msg.role === 'bot' ? (
-          <TypewriterMarkdown 
-            content={msg.content} 
-            animate={isLatestBotMsg} 
-            minDelay={2} 
-            maxDelay={8} 
-          />
         ) : (
-          <div className="markdown-body">
-            <ReactMarkdown>{msg.content}</ReactMarkdown>
+          <div className={`markdown-body ${isLatestBotMsg && isLoading ? 'typing-active' : ''}`}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code({node, inline, className, children, ...props}) {
+                  const match = /language-(\w+)/.exec(className || '')
+                  return !inline && match ? (
+                    <SyntaxHighlighter
+                      {...props}
+                      children={String(children).replace(/\n$/, '')}
+                      style={vscDarkPlus}
+                      language={match[1]}
+                      PreTag="div"
+                      customStyle={{
+                        background: 'rgba(0,0,0,0.5)',
+                        padding: '16px',
+                        borderRadius: '8px',
+                        margin: '12px 0',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                      }}
+                    />
+                  ) : (
+                    <code {...props} className={className}>
+                      {children}
+                    </code>
+                  )
+                }
+              }}
+            >
+              {msg.content}
+            </ReactMarkdown>
           </div>
         )}
 
@@ -116,6 +140,7 @@ const MessageBubble = ({
               <button 
                 className={`feedback-btn ${msg.feedbackGiven === 'up' ? 'active' : ''}`}
                 title="Good answer"
+                aria-label="Thumbs up"
                 onClick={() => onFeedback(idx, 'up')}
                 disabled={msg.feedbackGiven !== null}
               >
@@ -124,6 +149,7 @@ const MessageBubble = ({
               <button 
                 className={`feedback-btn ${msg.feedbackGiven === 'down' ? 'active' : ''}`}
                 title="Bad answer"
+                aria-label="Thumbs down"
                 onClick={() => onFeedback(idx, 'down')}
                 disabled={msg.feedbackGiven !== null}
               >
