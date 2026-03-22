@@ -509,8 +509,11 @@ if _FRONTEND_DIR.exists():
         file_path = _FRONTEND_DIR / full_path
         if full_path and file_path.exists() and file_path.is_file():
             return FileResponse(str(file_path))
-        # Otherwise serve index.html (SPA routing)
-        return FileResponse(str(_FRONTEND_DIR / "index.html"))
+        # Otherwise serve index.html (SPA routing) — no-cache to prevent stale builds
+        return FileResponse(
+            str(_FRONTEND_DIR / "index.html"),
+            headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+        )
 
     logger.info(f"[FRONTEND] Serving static files from {_FRONTEND_DIR}")
 else:
