@@ -625,6 +625,44 @@ a:hover {
   background: rgba(239, 68, 68, 0.4) !important;
 }
 
+/* Powered-by Footer */
+.powered-by-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 24px;
+  border-top: 1px solid var(--panel-border);
+  background: rgba(0,0,0,0.15);
+}
+
+.powered-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.arch-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.arch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  background: rgba(252, 109, 38, 0.08);
+  border: 1px solid rgba(252, 109, 38, 0.2);
+  color: var(--accent);
+  font-weight: 500;
+}
+
 /* Responsive Overrides */
 @media (max-width: 768px) {
   .app-container {

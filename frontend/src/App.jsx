@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Gitlab } from 'lucide-react';
+import { Gitlab, Database, Brain, Search, Cpu } from 'lucide-react';
 import Header from './components/Layout/Header';
 import ChatInput from './components/Chat/ChatInput';
 import MessageBubble from './components/Chat/MessageBubble';
@@ -121,6 +121,16 @@ function App() {
           isLoading={isLoading} 
           onStop={stopGenerating}
         />
+
+        <div className="powered-by-footer">
+          <span className="powered-label">Powered by</span>
+          <div className="arch-pills">
+            <span className="arch-pill"><Database size={12} /> FAISS</span>
+            <span className="arch-pill"><Search size={12} /> BM25</span>
+            <span className="arch-pill"><Cpu size={12} /> RRF Fusion</span>
+            <span className="arch-pill"><Brain size={12} /> Llama 3.3 70B</span>
+          </div>
+        </div>
       </div>
     </div>
   );
