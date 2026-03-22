@@ -1,11 +1,28 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const API_BASE = import.meta.env.DEV ? 'http://localhost:8000' : '';
 
+const STORAGE_KEY = 'gitlab-chat-messages';
+
+function loadSavedMessages() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore corrupt data */ }
+  return [];
+}
+
 export const useChatStream = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(loadSavedMessages);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Persist messages to sessionStorage on every change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch { /* quota exceeded — ignore */ }
+  }, [messages]);
   
   // Abort controller reference to cancel streams
   const abortControllerRef = useRef(null);
@@ -176,6 +193,10 @@ export const useChatStream = () => {
     handleSubmit,
     handleFeedback,
     toggleDetails,
-    stopGenerating
+    stopGenerating,
+    clearChat: () => {
+      setMessages([]);
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
   };
 };

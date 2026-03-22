@@ -1,7 +1,7 @@
 import React from 'react';
-import { Gitlab, Download } from 'lucide-react';
+import { Gitlab, Download, Trash2 } from 'lucide-react';
 
-const Header = ({ onExport, hasMessages }) => {
+const Header = ({ onExport, onClear, hasMessages }) => {
   return (
     <header className="header premium-header">
       <div className="header-brand">
@@ -14,10 +14,16 @@ const Header = ({ onExport, hasMessages }) => {
         </div>
       </div>
       {hasMessages && (
-        <button className="export-btn" onClick={onExport} title="Export Chat">
-          <Download size={18} />
-          <span>Export</span>
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="export-btn" onClick={onClear} title="Clear Chat">
+            <Trash2 size={18} />
+            <span>Clear</span>
+          </button>
+          <button className="export-btn" onClick={onExport} title="Export Chat">
+            <Download size={18} />
+            <span>Export</span>
+          </button>
+        </div>
       )}
     </header>
   );

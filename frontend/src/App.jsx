@@ -24,7 +24,8 @@ function App() {
     handleSubmit,
     handleFeedback,
     toggleDetails,
-    stopGenerating
+    stopGenerating,
+    clearChat
   } = useChatStream();
 
   const messagesEndRef = useRef(null);
@@ -69,7 +70,7 @@ function App() {
   return (
     <div className="app-container">
       <div className="glass-panel main-glass">
-        <Header onExport={handleExport} hasMessages={messages.length > 0} />
+        <Header onExport={handleExport} onClear={clearChat} hasMessages={messages.length > 0} />
 
         <div className="chat-container">
           {messages.length === 0 && (
