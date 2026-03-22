@@ -29,7 +29,7 @@ EMBEDDING_BATCH_SIZE = 128
 # ---------------------------------------------------------------------------
 LLM_PROVIDER = "groq"
 LLM_MODEL = "llama-3.3-70b-versatile"
-LLM_TEMPERATURE = 0.3
+LLM_TEMPERATURE = 0.5
 LLM_MAX_OUTPUT_TOKENS = 2048
 
 # ---------------------------------------------------------------------------

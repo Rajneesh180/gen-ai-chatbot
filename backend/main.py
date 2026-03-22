@@ -259,13 +259,13 @@ async def chat_endpoint(req: ChatRequest):
 
             full_text = ""
             # ----------------------------------------------------------
-            # Phase 1: Buffer the ENTIRE LLM response.
-            # We do NOT stream raw tokens because the LLM output contains
-            # structured metadata (<<<META>>>) and suggestion blocks
-            # (<<<SUGGESTIONS>>>) that must be stripped before the user
-            # sees them. Buffering first, then parsing, guarantees no
-            # metadata ever leaks into the chat UI.
+            # Approach: Buffer the full LLM response, parse out the
+            # structured blocks (META/SUGGESTIONS), then send the clean
+            # answer to the frontend. This is bulletproof against marker
+            # leaking — no partial <<<META>>> or <<<SUGGESTIONS>>> can
+            # ever reach the client.
             # ----------------------------------------------------------
+
             try:
                 _rate_limiter.record()
                 for chunk_text in generate_stream(prompt):
@@ -282,16 +282,13 @@ async def chat_endpoint(req: ChatRequest):
                 yield 'data: {"type": "done"}\n\n'
                 return
 
-            # ----------------------------------------------------------
-            # Phase 2: Parse the buffered response to separate the clean
-            # answer from the metadata and suggestions blocks.
-            # ----------------------------------------------------------
+            # Parse the complete response
             parsed = _parse_llm_response(full_text)
 
-            # Send metadata first (confidence, answer type, guardrails)
+            # Send metadata
             yield f"data: {json.dumps({'type': 'metadata', 'metadata': parsed['metadata']})}\n\n"
 
-            # Send the clean answer (all <<<META>>> / <<<SUGGESTIONS>>> stripped)
+            # Send clean answer as content
             yield f"data: {json.dumps({'type': 'content', 'text': parsed['answer']})}\n\n"
 
             # Send suggested follow-up questions
