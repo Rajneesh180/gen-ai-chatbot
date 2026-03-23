@@ -26,6 +26,7 @@ data/validation_report.json
 data/sample_inspection.txt
 data/ingest.log
 data/feedback.jsonl
+data/eval_results.json
 
 # Keep these 3 index files (needed for deployment):
 # data/faiss.index
